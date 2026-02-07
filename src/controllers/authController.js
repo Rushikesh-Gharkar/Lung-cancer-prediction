@@ -71,3 +71,7 @@ const userLogin = async (req , res)=>{
            })
     }
 }
+
+module.exports = {registerUser : registerUser,
+    userLogin : userLogin
+}
