@@ -5,9 +5,11 @@ const {validate} = require('../middleware/validate')
 
 const router = express.Router()
 
+router.get('/ping' , (req  , res) => {
+    res.send('alive router')
+})
+
 router.post("/register" , validate(registerSchema) , registerUser)
 router.post("/login" , validate(loginSchema) , userLogin)
 
-module.exports = {
-    router:router
-}
+module.exports = router

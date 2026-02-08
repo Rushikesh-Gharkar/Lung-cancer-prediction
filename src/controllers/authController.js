@@ -5,6 +5,7 @@ require('dotenv').config()
 
 const registerUser = async (req , res)=>{
     try{
+        console.log("REGISTER DATA:", req.body);
         const {firstname , lastname , age,email , password} = req.body
 
         const existingUser = await User.findOne({email : email})
@@ -26,13 +27,15 @@ const registerUser = async (req , res)=>{
             password : hashedPassword
         })
 
-       return res.status(500).json({
+       return res.status(201).json({
             success:true,
-            message : "User signup successful"
+            message : "User signup successful",
+            data : req.body,
         })
-
+        
     }
     catch(err){
+        console.error("REGISTER ERROR:", err);
        return res.status(500).json({
         success : false,
         message : "Server error"
@@ -44,13 +47,21 @@ const userLogin = async (req , res)=>{
     try{
         const {email , password} = req.body;
         
-        const user = User.findOne({email})
+        const user = await User.findOne({email})
 
         if(!user) {
             return res.status(409).json({
                 success:false,
                 message : "Incorrect credentials"
             })
+        }
+
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+          return res.status(401).json({
+            success: false,
+            message: "Invalid credentials"
+          });
         }
 
         const token = jwt.sign(
@@ -72,6 +83,4 @@ const userLogin = async (req , res)=>{
     }
 }
 
-module.exports = {registerUser : registerUser,
-    userLogin : userLogin
-}
+module.exports = {registerUser , userLogin}
